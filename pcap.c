@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
 	struct pcap_pkthdr *header;
 	const u_char *packet;
 	int status;
+	struct ether_header *ether;
+	char buf[10000];
 
 	//get device info - using default setting//
 	dev = pcap_lookupdev(errbuf);
@@ -36,11 +38,17 @@ int main(int argc, char *argv[])
 	//get packet and analyze
 	while(1)
 	{
-		printf("1\n");
 		status = pcap_next_ex(handle, &header, &packet);
-		printf("2\n");
+
 		if(status < 1)
-			continue;
+			continue; //error or being read or time out//
+
 		printf("Capture the packet!!!\n");
+		
+		ether = (struct ether_header*)packet;
+
+		//Use ether_ntoa_r for reentrant thread-safe//
+		printf("S o u r c e  MAC : %s\n", ether_ntoa_r(ether->ether_shost, buf));
+		printf("Destionation MAC : %s\n", ether_ntoa_r(ether->ether_dhost, buf));
 	}
 }
