@@ -47,8 +47,8 @@ void pcap(pcap_t *handle, struct pcap_pkthdr *header, const u_char *packet)
 
 		tcp	= (struct tcphdr*)(packet + ETH_HLEN + 4 * ipv4->ip_hl);
 
-		printf("S o u r c e Port : %d\n", tcp->th_sport);
-		printf("Destination Port : %d\n", tcp->th_dport);
+		printf("S o u r c e Port : %d\n", ntohs(tcp->th_sport));
+		printf("Destination Port : %d\n", ntohs(tcp->th_dport));
 
 		data_loc = ETH_HLEN + 4 * ipv4->ip_hl + 4 * tcp->th_off; // Data located in after Ethernet header, IP header, TCP header(TCP offset)
 
@@ -56,9 +56,11 @@ void pcap(pcap_t *handle, struct pcap_pkthdr *header, const u_char *packet)
 
 		for(int i = data_loc; i<data_loc+10; i++)
 		{
-			printf("%02x\n", packet[i]);
+			printf("%02x ", packet[i]);
 		}
+
+		printf("\n");
 		
 	}
-	
+	return (0);
 }
