@@ -14,8 +14,8 @@ void pcap(pcap_t *handle, struct pcap_pkthdr *header, const u_char *packet)
 	char buf[1000];
 	struct ip *ipv4;
 	struct tcphdr *tcp;
-	int data_loc;
 	int i = 1;
+	int len;
 
 	printf("-------------------------------------------------\n\n");
 	while(1)
@@ -40,8 +40,8 @@ void pcap(pcap_t *handle, struct pcap_pkthdr *header, const u_char *packet)
 		
 		ipv4 = (struct ip*)(packet + ETH_HLEN);
 
-		printf("S o u r c e IP : %s\n", inet_ntoa(ipv4->ip_src));
-		printf("Destination IP : %s\n\n", inet_ntoa(ipv4->ip_dst));
+		printf("S o u r c e IP : %s\n", inet_ntop(AF_INET, &ipv4->ip_src, buf, sizeof(buf)));
+		printf("Destination IP : %s\n\n", inet_ntop(AF_INET, &ipv4->ip_dst, buf, sizeof(buf)));
 
 		if(ipv4->ip_p != IPPROTO_TCP)
 			continue;
@@ -51,18 +51,26 @@ void pcap(pcap_t *handle, struct pcap_pkthdr *header, const u_char *packet)
 		printf("S o u r c e Port : %d\n", ntohs(tcp->th_sport));
 		printf("Destination Port : %d\n\n", ntohs(tcp->th_dport));
 
-		data_loc = ETH_HLEN + 4 * ipv4->ip_hl + 4 * tcp->th_off; // Data located in after Ethernet header, IP header, TCP header(TCP offset)
+		//printf("ip len : %d", ntohs(ipv4->ip_len));
+		len = ntohs(ipv4->ip_len) - (4 * ipv4->ip_hl + 4 * tcp->th_off);
 
 		printf("< Data Part >\n");
 
-		for(int i = data_loc; i<data_loc+10; i++)
+		if(len > 10)
 		{
-			printf("%02x ", packet[i]);
+			for(int i = 0; i<10; i++)
+				printf("%02x ", packet[i+ETH_HLEN+4 * ipv4->ip_hl + 4 * tcp->th_off]);
+		}
+		else if(len == 0)
+			printf("No Data\n");
+		else
+		{
+			for(int i = 0; i<len; i++)
+				printf("%02x ", packet[i+ETH_HLEN+4 * ipv4->ip_hl + 4 * tcp->th_off]);
 		}
 
 		printf("\n\n");
 		printf("-------------------------------------------------\n\n");
-		
 	}
 	return (0);
 }
