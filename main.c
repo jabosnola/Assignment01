@@ -19,27 +19,20 @@ int main(int argc, char *argv[])
 	struct ip *ipv4;
 	struct tcphdr *tcp;
 	int data_loc;
-	char *dum0;
+	char *dev;
 
 	//get device info - using default setting//
-	dum0 = pcap_lookupdev(errbuf);
+	dev = argv[1];
 	
-	if(dum0 == NULL)
-	{
-		fprintf(stderr, "Couldn't find default device: %s\n", errbuf);
-		return(2);
-	}
-	printf("Device: %s\n", dum0);
+	printf("Device: %s\n", dev);
 
-	handle = pcap_open_live(dum0, BUFSIZ, 1, 1000, errbuf);
+	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
 
 	if(handle == NULL)
 	{
 		fprintf(stderr, "Couldn't find default device: %s\n", errbuf);
 		return(2);
 	}
-	//printf("Device: %s\n", 'dum0');
-
 	//get packet and analyze
 	pcap(handle, header, packet);
 	return (0);
