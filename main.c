@@ -21,7 +21,18 @@ int main(int argc, char *argv[])
 	int data_loc;
 	char *dev;
 
+	//notice information that how to user//
+	printf("You Can Capture The Packet.\n");
+	printf("==============================================\n");
+	printf("argv[1] : device info\n");
+	printf("You must give argv[1]. (ex: ./pcap dum0)\n");
 	//get device info - using default setting//
+	if(argc != 2)
+	{
+		printf("Argument Error...You must restart...\n");
+		return(2);
+	}
+
 	dev = argv[1];
 	
 	printf("Device: %s\n", dev);
